@@ -18,7 +18,10 @@ public class WebScrapingImpl implements WebScraping {
 		WebScraping webScraping = new WebScrapingImpl();
 
 		String htmlBody = webScraping.getHtmlBody("https://github.com/rickbala/feedthebirds").getHtml();
-		System.out.println(htmlBody);
+		//System.out.println(htmlBody);
+
+		String tbody = webScraping.findElementByTag(htmlBody, "tbody");
+		System.out.println(tbody);
 	}
 
 	@Override
@@ -64,7 +67,7 @@ public class WebScrapingImpl implements WebScraping {
 	public String findElementByTag(String htmlBody, String tagName) {
 		String res;
 		int startPos = htmlBody.indexOf(tagName);
-		int endPos = htmlBody.indexOf(tagName, startPos + tagName.length() + 1);
+		int endPos = htmlBody.indexOf(tagName, startPos + tagName.length());
 		res = htmlBody.substring(startPos, endPos);
 		return res;
 	}
