@@ -1,5 +1,8 @@
-package com.rickbala.api.entity;
+package com.rickbala.githubanalyser.entity;
 
+/**
+ * Represents either a folder a file from a github repository
+ */
 public class GitHubItem {
 
 	private boolean isDirectory;
@@ -7,17 +10,6 @@ public class GitHubItem {
 	private String extension;
 	private Long bytes;
 	private Long lines;
-
-	@Override
-	public String toString() {
-		return "GitHubItem{" +
-				"isDirectory=" + isDirectory +
-				", href='" + href + '\'' +
-				", extension='" + extension + '\'' +
-				", bytes=" + bytes +
-				", lines=" + lines +
-				"}\n";
-	}
 
 	public boolean isDirectory() {
 		return isDirectory;
@@ -57,6 +49,20 @@ public class GitHubItem {
 
 	public void setLines(Long lines) {
 		this.lines = lines;
+	}
+
+	/**
+	 * @return a representation of the object and its fields values
+	 */
+	@Override
+	public String toString() {
+		return "GitHubItem{" +
+				"isDirectory=" + isDirectory +
+				", href='" + href + '\'' +
+				", extension='" + extension + '\'' +
+				", bytes=" + bytes +
+				", lines=" + lines +
+				"}\n";
 	}
 
 }

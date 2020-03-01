@@ -1,21 +1,30 @@
 package com.rickbala.githubanalyser.business;
 
+import com.rickbala.api.WebScraping;
 import com.rickbala.api.WebScrapingImpl;
-import com.rickbala.api.entity.GitHubItem;
+import com.rickbala.githubanalyser.entity.GitHubItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main class that implements the web scraping API module
+ */
 public class GitHubAnalyser {
 
 	private int count = 0;
-	private String rawContent = "https://raw.githubusercontent.com";
-	private String githubUrl = "https://github.com";
+	private static final String rawContent = "https://raw.githubusercontent.com";
+	private static final String githubUrl = "https://github.com";
 
+	/**
+	 * Main method that iterates over all the table rows of a give repository page searching for data
+	 * @param repoUrl the repoUrl that comes from the input field on the index.html file
+	 * @param gitHubItems a list of GitHubItem entities that will be later summarized by the MainController
+	 * @throws IOException in a case the page searched for is not available
+	 */
 	public void analyseRepositoryPage(String repoUrl, List<GitHubItem> gitHubItems) throws IOException {
-		WebScrapingImpl ws = new WebScrapingImpl();
-		System.out.println("Fetching data for " + repoUrl);
+		WebScraping ws = new WebScrapingImpl();
 
 		String body = ws.getHtmlBody(repoUrl);
 		String tbody = ws.findElementByTag(body, "tbody");
@@ -50,6 +59,12 @@ public class GitHubAnalyser {
 		}
 	}
 
+	/**
+	 * Auxiliary method for that extracts the value of an html attribute
+	 * @param tbody the htmlBody to search for
+	 * @param search the attribute name
+	 * @return the value inside the quotes of an attribute
+	 */
 	private String extractAttributeValue(String tbody, String search) {
 		String res = "";
 		int start = tbody.indexOf(search, count) + search.length() + 1;
@@ -60,6 +75,12 @@ public class GitHubAnalyser {
 		return res;
 	}
 
+	/**
+	 * Iterates through all the extensions found and makes a list of distinct values
+	 * Can evolve into a lambda function later
+	 * @param gitHubItems a list of GitHubItem entities created by the analyseRepository method
+	 * @return a list of String containing non repeatable file extension names
+	 */
 	public List<String> createDistinctExtensionsList(List<GitHubItem> gitHubItems){
 		List<String> distinctExtensionsList = new ArrayList<>();
 		for (GitHubItem gitHubItem : gitHubItems)
@@ -68,6 +89,12 @@ public class GitHubAnalyser {
 		return distinctExtensionsList;
 	}
 
+	/**
+	 * Summarizes bytes and number of lines from a given list fo GitHubItems, by extension name
+	 * @param gitHubItems the list of GitHubItem entities that will serve as input data
+	 * @param distinctExtensions the list of distinct extension names in the list of GitHubItems
+	 * @return a String that summarizes everything and shall be given back to the user on the front-end
+	 */
 	public String summarizeByExtension(List<GitHubItem> gitHubItems, List<String> distinctExtensions){
 		StringBuilder res = new StringBuilder();
 		Long totalBytes = 0L;

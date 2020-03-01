@@ -10,13 +10,6 @@ import java.net.URLConnection;
 
 public class WebScrapingImpl implements  WebScraping{
 
-	public static void main(String[] args) throws IOException {
-		WebScrapingImpl webScraping = new WebScrapingImpl();
-
-		String htmlBody = webScraping.getHtmlBody("https://github.com/rickbala/feedthebirds/find/master");
-		System.out.println(htmlBody);
-	}
-
 	@Override
 	public String getHtmlBody(String urlString) throws IOException{
 		String body = "";
