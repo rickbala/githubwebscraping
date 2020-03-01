@@ -1,46 +1,58 @@
 package com.rickbala.api;
 
+import com.rickbala.api.entity.GitHubAnalyser;
+import com.rickbala.api.entity.GitHubItem;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-public class WebScrapingConsole {
+public class Console {
 
-	static int count = 0;
+	private static int count = 0;
 	private static String rawContent = "https://raw.githubusercontent.com";
 	private static String githubUrl = "https://github.com";
 
 	public static void main(String[] args) throws IOException {
-		String repoUrl = "https://github.com/rickbala/feedthebirds";
+		String repoUrl = "https://github.com/rickbala/sway-webapp";
+		List<GitHubItem> gitHubItems = new ArrayList<>();
+		GitHubAnalyser gitHubAnalyser = new GitHubAnalyser();
+		gitHubAnalyser.analyseRepositoryPage(repoUrl,gitHubItems);
+		System.out.println(gitHubItems);
+	}
 
+	private static void analyseRepositoryPage(String repoUrl, List<GitHubItem> gitHubItems) throws IOException {
 		WebScraping ws = new WebScrapingImpl();
 		String body = ws.getHtmlBody(repoUrl);
 		String tbody = ws.findElementByTag(body, "tbody");
 
 		while(tbody.indexOf("<tr", count) != -1){
+			GitHubItem item = new GitHubItem();
 
 			String ariaLabel = extractAttributeValue(tbody, "aria-label");
-			boolean isFolder = false;
-			if (ariaLabel.equals("directory")) isFolder = true;
-			System.out.println("isFolder: " + isFolder);
+			boolean isDirectory = false;
+			if (ariaLabel.equals("directory")) isDirectory = true;
+			item.setDirectory(isDirectory);
 
 			String href = extractAttributeValue(tbody, "href");
-			System.out.println("Href: " + href);
+			item.setHref(href);
 
 			String extension = null;
 			Long bytes = null;
 			Long lines = null;
-			if (!isFolder) {
+			if (!isDirectory) {
 				extension = extractHrefExtension(href);
 				bytes = getFileSize(rawContent + href.replace("/blob", ""));
 				lines = getNumberOfLines(githubUrl + href);
 			}
-			System.out.println("Extension: " + extension);
-			System.out.println("Bytes: " + bytes);
-			System.out.println("Lines: " + lines);
+			item.setExtension(extension);
+			item.setBytes(bytes);
+			item.setLines(lines);
 
-			System.out.println();
+			gitHubItems.add(item);
 		}
 	}
 

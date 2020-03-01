@@ -58,9 +58,10 @@ public class WebScrapingImpl implements WebScraping {
 	@Override
 	public String findElementByTag(String htmlBody, String tagName) {
 		String res;
-		int startPos = htmlBody.indexOf("<" + tagName);
-		int endPos = htmlBody.indexOf("</" +tagName + ">", startPos + tagName.length() + 4);
-		res = htmlBody.substring(startPos, endPos);
+		int start = htmlBody.indexOf("<" + tagName);
+		if (start < 0 ) return null;
+		int end = htmlBody.indexOf("</" +tagName + ">", start + 1) + tagName.length() + 3;
+		res = htmlBody.substring(start, end).trim();
 		return res;
 	}
 

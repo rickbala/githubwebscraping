@@ -8,6 +8,17 @@ public class GitHubItem {
 	private Long bytes;
 	private Long lines;
 
+	@Override
+	public String toString() {
+		return "GitHubItem{" +
+				"isDirectory=" + isDirectory +
+				", href='" + href + '\'' +
+				", extension='" + extension + '\'' +
+				", bytes=" + bytes +
+				", lines=" + lines +
+				"}\n";
+	}
+
 	public boolean isDirectory() {
 		return isDirectory;
 	}
