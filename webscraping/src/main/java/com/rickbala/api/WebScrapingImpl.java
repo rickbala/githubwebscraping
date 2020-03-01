@@ -1,7 +1,5 @@
 package com.rickbala.api;
 
-import com.rickbala.api.entity.Body;
-
 import java.io.*;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;

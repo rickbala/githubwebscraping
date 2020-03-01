@@ -1,12 +1,12 @@
-package com.rickbala.api.entity;
+package com.rickbala.api;
 
-import com.rickbala.api.WebScraping;
-import com.rickbala.api.WebScrapingImpl;
+import com.rickbala.api.entity.GitHubItem;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GitHubAnalyser {
@@ -17,7 +17,7 @@ public class GitHubAnalyser {
 
 	public void analyseRepositoryPage(String repoUrl, List<GitHubItem> gitHubItems) throws IOException {
 		WebScraping ws = new WebScrapingImpl();
-		System.out.println("Fetching data for " + repoUrl);
+		//System.out.println("Fetching data for " + repoUrl);
 
 		String body = ws.getHtmlBody(repoUrl);
 		String tbody = ws.findElementByTag(body, "tbody");
@@ -64,7 +64,7 @@ public class GitHubAnalyser {
 
 	private String extractHrefExtension(String href){
 		String res = "";
-		int start = href.indexOf(".");
+		int start = href.lastIndexOf(".");
 		if (start < 0) return "no extension";
 		int end = href.length();
 		res = href.substring(start, end);
@@ -100,6 +100,35 @@ public class GitHubAnalyser {
 		String linesStr = body.substring(start,end).trim();
 		res = Long.valueOf(linesStr);
 		return res;
+	}
+
+	public List<String> createDistinctExtensionsList(List<GitHubItem> gitHubItems){
+		List<String> distinctExtensionsList = new ArrayList<>();
+		for (GitHubItem gitHubItem : gitHubItems)
+			if (gitHubItem.getExtension() != null && !distinctExtensionsList.contains(gitHubItem.getExtension()))
+				distinctExtensionsList.add(gitHubItem.getExtension());
+		return distinctExtensionsList;
+	}
+
+	public String summarizeByExtension(List<GitHubItem> gitHubItems, List<String> distinctExtensions){
+		StringBuilder res = new StringBuilder();
+		Long totalBytes = 0L;
+		Long totalLines = 0L;
+		for (String extension : distinctExtensions){
+			Long bytes = 0L;
+			Long lines = 0L;
+			for (GitHubItem gitHubItem : gitHubItems){
+				if (gitHubItem.getExtension()!= null && gitHubItem.getExtension().equals(extension)) {
+					if (gitHubItem.getBytes() != null) bytes += gitHubItem.getBytes();
+					if (gitHubItem.getLines() != null) lines += gitHubItem.getLines();
+				}
+			}
+			totalBytes += bytes;
+			totalLines += lines;
+			res.append("-Extension: " + extension + ", totalBytes: " + bytes + ", totalLines: " + lines + "\n");
+		}
+		res.append("Total Bytes: " + totalBytes +", Total Lines: " + totalLines);
+		return res.toString();
 	}
 
 }
