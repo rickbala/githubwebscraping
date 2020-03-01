@@ -1,7 +1,7 @@
 package com.rickbala.githubanalyser.controller;
 
-import com.rickbala.api.GitHubAnalyser;
 import com.rickbala.api.entity.GitHubItem;
+import com.rickbala.githubanalyser.business.GitHubAnalyser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +20,12 @@ public class MainController {
 		String res = null;
 		List<GitHubItem> gitHubItems = new ArrayList<>();
 		GitHubAnalyser gitHubAnalyser = new GitHubAnalyser();
-		gitHubAnalyser.analyseRepositoryPage(repoUrl, gitHubItems);
+		try {
+			gitHubAnalyser.analyseRepositoryPage(repoUrl, gitHubItems);
+		}catch (Exception e){
+			e.printStackTrace();
+			return "Error fetching data from repository. " + e.getMessage();
+		}
 		List<String> distinctExtensionsList = gitHubAnalyser.createDistinctExtensionsList(gitHubItems);
 		String summary = gitHubAnalyser.summarizeByExtension(gitHubItems, distinctExtensionsList);
 		return summary.replace("\n", "<br/>");

@@ -1,37 +1,20 @@
 package com.rickbala.api;
 
-import java.io.*;
-import java.math.BigInteger;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.util.List;
 
-public class WebScrapingImpl implements WebScraping {
+public class WebScrapingImpl implements  WebScraping{
 
 	public static void main(String[] args) throws IOException {
-		WebScraping webScraping = new WebScrapingImpl();
+		WebScrapingImpl webScraping = new WebScrapingImpl();
 
 		String htmlBody = webScraping.getHtmlBody("https://github.com/rickbala/feedthebirds/find/master");
 		System.out.println(htmlBody);
-
-		//String tbody = webScraping.findElementByTag(htmlBody, "tbody");
-		//System.out.println(tbody);
-	}
-
-	@Override
-	public void downloadFile(String url, String outputFile) throws IOException {
-		URL website = new URL(url);
-		ReadableByteChannel readableByteChannel = Channels.newChannel(website.openStream());
-		FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
-		try {
-			fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -49,7 +32,6 @@ public class WebScrapingImpl implements WebScraping {
 		}
 		bufferedReader.close();
 
-//		Body htmlBody = new Body(body);
 		return body;
 	}
 
@@ -64,55 +46,53 @@ public class WebScrapingImpl implements WebScraping {
 	}
 
 	@Override
-	public BigInteger getFileSize(String urlString) throws MalformedURLException {
-		URL url = new URL(urlString);
-		HttpURLConnection httpURLConnection;
-		BigInteger size = new BigInteger("0");
+	public String extractHrefExtension(String href){
+		String res = "";
+		int start = href.lastIndexOf(".");
+		if (start < 0) return "no extension";
+		int end = href.length();
+		res = href.substring(start, end);
+		return res;
+	}
 
+	@Override
+	public Long getFileSize(String urlString) {
+		HttpURLConnection httpURLConnection;
+		Long size = null;
 		try {
+			URL url = new URL(urlString);
 			httpURLConnection = (HttpURLConnection) url.openConnection();
 			httpURLConnection.setRequestMethod("HEAD");
-			size = BigInteger.valueOf(httpURLConnection.getContentLength());
+			size = Long.valueOf(httpURLConnection.getContentLength());
 			httpURLConnection.getInputStream().close();
 		} catch (Exception e) {
 			System.out.println("Error while getting file info: " + urlString);
 		}
-
 		return size;
 	}
 
 	@Override
-	public String getFileName(String url) {
-		return null;
+	public Long getNumberOfLines(String urlString) {
+		Long res = null;
+		String body = null;
+		try {
+			body = getHtmlBody(urlString);
+		} catch (Exception e){
+			e.printStackTrace();
+			System.out.println("error accessing the url: " + urlString);
+			return null;
+		}
+		int start = body.indexOf(" lines") - 7;
+		if (start < 0) return null;
+		int end = body.indexOf("lines");
+		String linesStr = body.substring(start,end).trim();
+		res = Long.valueOf(linesStr);
+		return res;
 	}
 
 	@Override
-	public String getFileExtension(String url) {
-		return null;
+	public void downloadFile(String url, String outputFile) throws IOException {
+		//TODO implement this method. Not really necessary for now
 	}
-
-	@Override
-	public boolean getIsLink(String url) {
-		return false;
-	}
-
-	@Override
-	public String getAttributeFromElement(String element, int startPos) {
-		return null;
-	}
-
-	@Override
-	public List<String> getAllOccurrencesOfTag(String htmlBody) {
-		return null;
-	}
-
-
-//	@Override
-//	public Element findElementByTag(Body body, Element element) {
-//		int startPos = body.getHtml().indexOf(element.getHtml());
-//		int endPos = htmlBody.body.indexOf(">", startPos + 1);
-//		String elementBody = this.body.substring(startPos, endPos);
-//		return new Element(elementBody);
-//	}
 
 }
