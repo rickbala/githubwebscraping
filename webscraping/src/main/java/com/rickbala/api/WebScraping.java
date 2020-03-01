@@ -20,7 +20,7 @@ public interface WebScraping {
 	 ** @param urlString http address of an html file
 	 ** @return a String containing the html body
 	 **/
-	Body getHtmlBody(String urlString) throws IOException;
+	String getHtmlBody(String urlString) throws IOException;
 
 // 	/**
 //	 ** @param htmlBody an object that contains a html body

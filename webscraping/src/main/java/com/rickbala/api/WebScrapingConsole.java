@@ -1,9 +1,6 @@
 package com.rickbala.api;
 
-import com.rickbala.api.entity.Body;
-
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,38 +9,38 @@ public class WebScrapingConsole {
 
 	static int count = 0;
 	private static String rawContent = "https://raw.githubusercontent.com";
+	private static String githubUrl = "https://github.com";
 
 	public static void main(String[] args) throws IOException {
 		String repoUrl = "https://github.com/rickbala/feedthebirds";
-		//String rawContentRepoUrl = repoUrl.replace("https://github.com/",rawContent) + "/master";
-		//System.out.println(rawContentRepoUrl);
 
 		WebScraping ws = new WebScrapingImpl();
-		Body body = ws.getHtmlBody(repoUrl);
-		String tbody = ws.findElementByTag(body.getHtml(), "tbody");
+		String body = ws.getHtmlBody(repoUrl);
+		String tbody = ws.findElementByTag(body, "tbody");
 
 		while(tbody.indexOf("<tr", count) != -1){
+
 			String ariaLabel = extractAttributeValue(tbody, "aria-label");
 			boolean isFolder = false;
 			if (ariaLabel.equals("directory")) isFolder = true;
-//			System.out.println(ariaLabel);
 			System.out.println("isFolder: " + isFolder);
 
 			String href = extractAttributeValue(tbody, "href");
 			System.out.println("Href: " + href);
 
 			String extension = null;
-			BigInteger size = null;
+			Long bytes = null;
+			Long lines = null;
 			if (!isFolder) {
-				extension = extractExtension(href);
-				size = getFileSize(rawContent + href.replace("/blob", ""));
+				extension = extractHrefExtension(href);
+				bytes = getFileSize(rawContent + href.replace("/blob", ""));
+				lines = getNumberOfLines(githubUrl + href);
 			}
 			System.out.println("Extension: " + extension);
-			System.out.println("Bytes: " + size);
+			System.out.println("Bytes: " + bytes);
+			System.out.println("Lines: " + lines);
 
 			System.out.println();
-
-
 		}
 	}
 
@@ -57,7 +54,7 @@ public class WebScrapingConsole {
 		return res;
 	}
 
-	private static String extractExtension(String href){
+	private static String extractHrefExtension(String href){
 		String res = "";
 		int start = href.indexOf(".");
 		if (start == -1) return "no extension";
@@ -66,21 +63,34 @@ public class WebScrapingConsole {
 		return res;
 	}
 
-	private static BigInteger getFileSize(String urlString) throws MalformedURLException {
+	private static Long getFileSize(String urlString) throws MalformedURLException {
 		URL url = new URL(urlString);
 		HttpURLConnection httpURLConnection;
-		BigInteger size = new BigInteger("0");
+		Long size = null;
 
 		try {
 			httpURLConnection = (HttpURLConnection) url.openConnection();
 			httpURLConnection.setRequestMethod("HEAD");
-			size = BigInteger.valueOf(httpURLConnection.getContentLength());
+			size = Long.valueOf(httpURLConnection.getContentLength());
 			httpURLConnection.getInputStream().close();
 		} catch (Exception e) {
 			System.out.println("Error while getting file info: " + urlString);
 		}
 
 		return size;
+	}
+
+	private static Long getNumberOfLines(String urlString) throws IOException {
+		Long res = null;
+
+		WebScraping ws = new WebScrapingImpl();
+		String body = ws.getHtmlBody(urlString);
+
+		int start = body.indexOf(" lines") - 7;
+		int end = body.indexOf("lines");
+		String linesStr = body.substring(start,end).trim();
+		res = Long.valueOf(linesStr);
+		return res;
 	}
 
 }

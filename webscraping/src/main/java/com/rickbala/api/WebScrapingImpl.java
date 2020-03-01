@@ -17,7 +17,7 @@ public class WebScrapingImpl implements WebScraping {
 	public static void main(String[] args) throws IOException {
 		WebScraping webScraping = new WebScrapingImpl();
 
-		String htmlBody = webScraping.getHtmlBody("https://github.com/rickbala/feedthebirds/find/master").getHtml();
+		String htmlBody = webScraping.getHtmlBody("https://github.com/rickbala/feedthebirds/find/master");
 		System.out.println(htmlBody);
 
 		//String tbody = webScraping.findElementByTag(htmlBody, "tbody");
@@ -37,7 +37,7 @@ public class WebScrapingImpl implements WebScraping {
 	}
 
 	@Override
-	public Body getHtmlBody(String urlString) throws IOException{
+	public String getHtmlBody(String urlString) throws IOException{
 		String body = "";
 
 		URL url = new URL(urlString);
@@ -51,8 +51,8 @@ public class WebScrapingImpl implements WebScraping {
 		}
 		bufferedReader.close();
 
-		Body htmlBody = new Body(body);
-		return htmlBody;
+//		Body htmlBody = new Body(body);
+		return body;
 	}
 
 	@Override
@@ -62,11 +62,6 @@ public class WebScrapingImpl implements WebScraping {
 		int endPos = htmlBody.indexOf("</" +tagName + ">", startPos + tagName.length() + 4);
 		res = htmlBody.substring(startPos, endPos);
 		return res;
-	}
-
-	@Override
-	public List<String> getAllOccurrencesOfTag(String htmlBody) {
-		return null;
 	}
 
 	@Override
@@ -104,6 +99,11 @@ public class WebScrapingImpl implements WebScraping {
 
 	@Override
 	public String getAttributeFromElement(String element, int startPos) {
+		return null;
+	}
+
+	@Override
+	public List<String> getAllOccurrencesOfTag(String htmlBody) {
 		return null;
 	}
 
