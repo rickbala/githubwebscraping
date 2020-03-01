@@ -17,11 +17,11 @@ public class WebScrapingImpl implements WebScraping {
 	public static void main(String[] args) throws IOException {
 		WebScraping webScraping = new WebScrapingImpl();
 
-		String htmlBody = webScraping.getHtmlBody("https://github.com/rickbala/feedthebirds").getHtml();
-		//System.out.println(htmlBody);
+		String htmlBody = webScraping.getHtmlBody("https://github.com/rickbala/feedthebirds/find/master").getHtml();
+		System.out.println(htmlBody);
 
-		String tbody = webScraping.findElementByTag(htmlBody, "tbody");
-		System.out.println(tbody);
+		//String tbody = webScraping.findElementByTag(htmlBody, "tbody");
+		//System.out.println(tbody);
 	}
 
 	@Override
@@ -55,21 +55,18 @@ public class WebScrapingImpl implements WebScraping {
 		return htmlBody;
 	}
 
-//	@Override
-//	public Element findElementByTag(Body body, Element element) {
-//		int startPos = body.getHtml().indexOf(element.getHtml());
-//		int endPos = htmlBody.body.indexOf(">", startPos + 1);
-//		String elementBody = this.body.substring(startPos, endPos);
-//		return new Element(elementBody);
-//	}
-
 	@Override
 	public String findElementByTag(String htmlBody, String tagName) {
 		String res;
-		int startPos = htmlBody.indexOf(tagName);
-		int endPos = htmlBody.indexOf(tagName, startPos + tagName.length());
+		int startPos = htmlBody.indexOf("<" + tagName);
+		int endPos = htmlBody.indexOf("</" +tagName + ">", startPos + tagName.length() + 4);
 		res = htmlBody.substring(startPos, endPos);
 		return res;
+	}
+
+	@Override
+	public List<String> getAllOccurrencesOfTag(String htmlBody) {
+		return null;
 	}
 
 	@Override
@@ -106,13 +103,17 @@ public class WebScrapingImpl implements WebScraping {
 	}
 
 	@Override
-	public List<String> getAllOccurrencesOfTag(String htmlBody) {
-		return null;
-	}
-
-	@Override
 	public String getAttributeFromElement(String element, int startPos) {
 		return null;
 	}
+
+
+//	@Override
+//	public Element findElementByTag(Body body, Element element) {
+//		int startPos = body.getHtml().indexOf(element.getHtml());
+//		int endPos = htmlBody.body.indexOf(">", startPos + 1);
+//		String elementBody = this.body.substring(startPos, endPos);
+//		return new Element(elementBody);
+//	}
 
 }

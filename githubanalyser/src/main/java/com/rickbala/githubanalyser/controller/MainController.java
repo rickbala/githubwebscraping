@@ -24,6 +24,10 @@ public class MainController {
 
 		String tbody = ws.findElementByTag(body.getHtml(), "tbody");
 
+		int start = tbody.indexOf("aria-label=\"");
+		int end = tbody.indexOf("\'");
+		tbody.substring(start, end);
+
 		return tbody;
 	}
 
