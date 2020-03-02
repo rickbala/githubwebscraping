@@ -10,20 +10,22 @@
 <body>
 <h1>Welcome</h1>
 <p>Enter github repo url:</p>
-<input type="text" id="repoUrl" value="https://github.com/rickbala/sway-webapp" size="40"/>
+<input type="text" id="repoUrl" value="https://github.com/rickbala/agame" size="40"/>
 <br/><br/>
-<input type="button" value="1 Request" onclick="analyseRepo();"/>
-<input type="button" value="100 Requests" />
-<input type="button" value="1000 Requests" />
+<input type="button" value="1 Request" onclick="analyseRepo(1);"/>
+<input type="button" value="100 Requests" onclick="analyseRepo(100);"/>
+<input type="button" value="1000 Requests" onclick="if(confirm('This can take a while. Are you sure?')) analyseRepo(1000);"/>
 <br/><br/>
-<span id="result"></span>
+<div id="result"></div>
 <script>
-    function analyseRepo(){
+    function analyseRepo(count){
         $("#result").html('Fetching data...');
         const repoUrl= $("#repoUrl").val();
-        $.get("analyseRepo?repoUrl=" + repoUrl, function(data){
-			$("#result").html(data);
-		});
+        for (var i=0 ; i<count ; i++){
+            $.get("analyseRepo?repoUrl=" + repoUrl, function(data){
+                $("#result").html($("#result").html() + "<br/><br/>" + data);
+            });
+        }
     }
 </script>
 </body>
