@@ -16,10 +16,10 @@
 `cd githubanalyser/`<br/>
 `mvn spring-boot:run`<br/>
 
-### Or to try it with Docker
+### ...or try it with Docker
 `mvn clean install && cd githubanalyser/`<br/>
 `sudo docker build -t rickbala/githubanalyser . && sudo docker run -p 8080:8080 rickbala/githubanalyser`
-
+<br/><br/>
 Then, access localhost:8080 in your browser.
 
 ### Javadoc
