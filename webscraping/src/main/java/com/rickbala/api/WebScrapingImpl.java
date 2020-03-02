@@ -12,7 +12,7 @@ public class WebScrapingImpl implements  WebScraping{
 
 	@Override
 	public String getHtmlBody(String urlString) throws IOException{
-		String body = "";
+		StringBuilder body = new StringBuilder();
 
 		URL url = new URL(urlString);
 		URLConnection urlConnection = url.openConnection();
@@ -21,11 +21,11 @@ public class WebScrapingImpl implements  WebScraping{
 
 		String str;
 		while ((str=bufferedReader.readLine()) != null){
-			body += str;
+			body.append(str);
 		}
 		bufferedReader.close();
 
-		return body;
+		return body.toString();
 	}
 
 	@Override
@@ -40,8 +40,8 @@ public class WebScrapingImpl implements  WebScraping{
 
 	@Override
 	public String extractHrefExtension(String href){
-		String res = "";
-		int start = href.lastIndexOf(".");
+		String res;
+		int start = href.lastIndexOf('.');
 		if (start < 0) return "no extension";
 		int end = href.length();
 		res = href.substring(start, end);
@@ -51,7 +51,7 @@ public class WebScrapingImpl implements  WebScraping{
 	@Override
 	public Long getFileSize(String urlString) {
 		HttpURLConnection httpURLConnection;
-		Long size = null;
+		Long size;
 		try {
 			URL url = new URL(urlString);
 			httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -59,7 +59,9 @@ public class WebScrapingImpl implements  WebScraping{
 			size = Long.valueOf(httpURLConnection.getContentLength());
 			httpURLConnection.getInputStream().close();
 		} catch (Exception e) {
-			System.out.println("Error while getting file info: " + urlString);
+			e.printStackTrace();
+			System.out.println("Error while getting file size: " + urlString);
+			return null;
 		}
 		return size;
 	}
@@ -70,16 +72,16 @@ public class WebScrapingImpl implements  WebScraping{
 		String body = null;
 		try {
 			body = getHtmlBody(urlString);
+			int start = body.indexOf(" lines") - 7;
+			if (start < 0) return null;
+			int end = body.indexOf("lines");
+			String linesStr = body.substring(start,end).trim();
+			res = Long.valueOf(linesStr);
 		} catch (Exception e){
 			e.printStackTrace();
-			System.out.println("error accessing the url: " + urlString);
+			System.out.println("Error while getting number of lines: " + urlString);
 			return null;
 		}
-		int start = body.indexOf(" lines") - 7;
-		if (start < 0) return null;
-		int end = body.indexOf("lines");
-		String linesStr = body.substring(start,end).trim();
-		res = Long.valueOf(linesStr);
 		return res;
 	}
 

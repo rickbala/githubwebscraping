@@ -14,8 +14,8 @@ import java.util.List;
 public class GitHubAnalyser {
 
 	private int count = 0;
-	private static final String rawContent = "https://raw.githubusercontent.com";
-	private static final String githubUrl = "https://github.com";
+	private static final String RAW_CONTENT_URL = "https://raw.githubusercontent.com";
+	private static final String GITHUB_URL = "https://github.com";
 
 	/**
 	 * Main method that iterates over all the table rows of a give repository page searching for data
@@ -43,13 +43,13 @@ public class GitHubAnalyser {
 			String extension = null;
 			Long bytes = null;
 			Long lines = null;
-			if (!isDirectory) {
+			if (!isDirectory && href != null && !href.contains("/commit/")) {
 				extension = ws.extractHrefExtension(href);
-				bytes = ws.getFileSize(rawContent + href.replace("/blob", ""));
-				lines = ws.getNumberOfLines(githubUrl + href);
+				bytes = ws.getFileSize(RAW_CONTENT_URL + href.replace("/blob", ""));
+				lines = ws.getNumberOfLines(GITHUB_URL + href);
 			} else {
 				GitHubAnalyser gitHubAnalyser = new GitHubAnalyser();
-				gitHubAnalyser.analyseRepositoryPage(githubUrl + href, gitHubItems);
+				gitHubAnalyser.analyseRepositoryPage(GITHUB_URL + href, gitHubItems);
 			}
 			item.setExtension(extension);
 			item.setBytes(bytes);
@@ -65,11 +65,11 @@ public class GitHubAnalyser {
 	 * @param search the attribute name
 	 * @return the value inside the quotes of an attribute
 	 */
-	private String extractAttributeValue(String tbody, String search) {
-		String res = "";
+	protected String extractAttributeValue(String tbody, String search) {
+		String res;
 		int start = tbody.indexOf(search, count) + search.length() + 1;
 		if (start < 0) return null;
-		int end = tbody.indexOf("\"",  start + 1);
+		int end = tbody.indexOf('\"',  start + 1);
 		res = tbody.substring(start+1, end);
 		count = end + 1;
 		return res;
@@ -110,9 +110,10 @@ public class GitHubAnalyser {
 			}
 			totalBytes += bytes;
 			totalLines += lines;
-			res.append("-Extension: " + extension + ", totalBytes: " + bytes + ", totalLines: " + lines + "\n");
+			res.append("-Extension: ").append(extension).append(", totalBytes: ");
+			res.append(bytes).append(", totalLines: ").append(lines).append("\n");
 		}
-		res.append("Total Bytes: " + totalBytes +", Total Lines: " + totalLines);
+		res.append("Total Bytes: ").append(totalBytes).append(", Total Lines: ").append(totalLines);
 		return res.toString();
 	}
 

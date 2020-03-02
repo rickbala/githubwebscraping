@@ -24,13 +24,11 @@ public class MainController {
 	@GetMapping("/analyseRepo")
 	@ResponseBody
 	public String analyseRepo(@RequestParam String repoUrl) {
-		String res = null;
 		List<GitHubItem> gitHubItems = new ArrayList<>();
 		GitHubAnalyser gitHubAnalyser = new GitHubAnalyser();
 		try {
 			gitHubAnalyser.analyseRepositoryPage(repoUrl, gitHubItems);
 		}catch (Exception e){
-			e.printStackTrace();
 			return "Error fetching data from repository. " + e.getMessage();
 		}
 		List<String> distinctExtensionsList = gitHubAnalyser.createDistinctExtensionsList(gitHubItems);
